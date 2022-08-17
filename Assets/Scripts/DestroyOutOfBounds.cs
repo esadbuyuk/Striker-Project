@@ -10,14 +10,13 @@ public class DestroyOutOfBounds : MonoBehaviour
     private new Camera camera;
     private float bottomBound;
     private GameManager gameManager;
-    public bool resetLeft = false;
-    public bool resetRight = false;
-    public TextMeshProUGUI destroyedtext;
-    public bool destroyed = false;
+    [SerializeField]
+    private TextMeshProUGUI destroyedtext;
     public bool ResetDefender { get; private set; }
     private Spawner spawner;
     private GameObject spawnManager;
     private SpawnManager2 spawnManager2;
+    
 
     void OnEnable()
     {
@@ -29,7 +28,7 @@ public class DestroyOutOfBounds : MonoBehaviour
     {
         ResetDefender = false;
 
-        camera = Camera.main; //GameObject.Find("Main Camera");     
+        camera = Camera.main;     
         gameManager = GameObject.Find("Manager").GetComponent<GameManager>();
         spawner = gameObject.GetComponent<Spawner>();
         spawnManager = GameObject.Find("SpawnManager");
@@ -40,52 +39,17 @@ public class DestroyOutOfBounds : MonoBehaviour
     void Update()
     {
         bottomBound = camera.transform.position.y - camera.orthographicSize;
-    }
 
-
-    private void LateUpdate() // update yap�lcak!!
-    {
         if (transform.position.y < bottomBound - 0.5f)
         {
             ResetDefender = true;
             if (ResetDefender)
             {
-                destroyed = true;
                 gameObject.SetActive(false);
                 spawnManager2.IncreaseDestroyedDefs();
                 spawner.CallSpawnTimer();
-                // gameManager.UpdateScore(50);
+                gameManager.DefenderDestroyed();
             }
-
-            /*
-            if (gameObject.name == "defender right")
-            {
-                resetRight = true;
-                if (resetRight)
-                {
-                    destroyed = true;
-                    gameObject.SetActive(false);
-                    // gameManager.UpdateScore(50);      
-                    
-                }
-
-            }
-            else if (gameObject.name == "defender left")
-            {
-                resetLeft = true;
-                if (resetLeft)
-                {
-                    destroyed = true;                   
-                    gameObject.SetActive(false);
-                    // gameManager.UpdateScore(50);       
-
-                }
-
-            }*/
-            
         }
-
     }
-    
-
 }

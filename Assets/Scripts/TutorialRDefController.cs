@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 
 public class TutorialRDefController : MonoBehaviour
-{
+{/*
     private Animator rightDefenderAnim;
     // public static bool getPositionedR = false;
     private int stealTime;
@@ -234,7 +234,7 @@ public class TutorialRDefController : MonoBehaviour
             {
                 // StartCoroutine(StunCountdownRoutine(0.5f));                
             }
-            */
+            *//*
             if (!coroutineStarted) // countdown ba�lamad�ysa
             {
                 StartCoroutine(StealCountdownRoutine());
@@ -376,8 +376,8 @@ public class TutorialRDefController : MonoBehaviour
         /*if (rightDefenderAnim.GetCurrentAnimatorStateInfo(0).IsName("runback_right"))
         {
             rightDefenderAnim.SetBool("Runback", false); // bu ko�uldan kurtul
-        }*/
-    }
+        }*//*
+}
 
 
     private void Tackle()
@@ -433,5 +433,5 @@ public class TutorialRDefController : MonoBehaviour
     {
         Debug.Log("animation called!");
     }
-
+    */
 }

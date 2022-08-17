@@ -6,68 +6,51 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+    public bool HaveBall { get; private set; } = true;
+
+    [SerializeField] private GameObject ball;
+    [SerializeField] private GameObject goal;
+    [SerializeField] private Button fakeButton;
+    [SerializeField] private AttributeSettings attributeSettings;
     private Animator playerAnim;
-    //public GameObject projectilePrefab;
-    // public bool haveBall = true;
-    public static bool haveBall = true;
-    public GameObject ball;
-    public static float sprintSpeed = 8.0f;
-    public static float shContestSpeed = 3.2f;
     private Quaternion rotationToUp;
     private DefenderShoulder defenderShoulder;
-    public GameObject rightDef;
-    public GameObject leftDef;
-    private LDefenderController lDefenderController;
-    private RDefenderController rDefenderController;
-    private Vector3 shContestloserPosition;
-    private bool shoulderContestOn = false;
-    private Animator defAnim;
-    public bool leftDfalling = false;
-    public bool rightDfalling = false;
-    private Vector3 forwardVector;
-    private Vector3 defVector;
-    private float angle;
-    // private bool defOnLeft;
-    private MoveForward moveForward;
-    public static float goLeftNo = 1;
-    public GameObject goal;
-    public Vector3 aim;
-    private Vector3 mousePos;
-    public static bool shoot = false;
-    public Button fakeButton;
+    // [SerializeField] private GameObject rightDef;
+    // [SerializeField] private GameObject leftDef;
+    // private LDefenderController lDefenderController;
+    // private RDefenderController rDefenderController;
+    // public bool leftDfalling = false;
+    // public bool rightDfalling = false;  
+    private BallController ballController;
     private GameObject collideDef;
+    private MovementController movementController;
+    private SpriteFlipper spriteFlipper;
+    private Vector3 aim;
+    private bool shoulderContestOn = false;
+
+
+    private void Awake()
+    {
+        playerAnim = GetComponent<Animator>();
+        ballController = ball.GetComponent<BallController>();
+        movementController = new MovementController(transform, attributeSettings);
+        spriteFlipper = new SpriteFlipper(transform);       
+    }
+
 
     void Start()
     {
-        haveBall = true;
-        playerAnim = GetComponent<Animator>();
-
-        // ball = GameObject.Find("ball");
-        moveForward = ball.GetComponent<MoveForward>();
-
+        HaveBall = true;       
         rotationToUp = transform.rotation;
-
-        rDefenderController = rightDef.GetComponent<RDefenderController>();
-        lDefenderController = leftDef.GetComponent<LDefenderController>(); // bunları public ile alman gerek cunku kompozisyon yaptın.
-
-        playerAnim.SetFloat("dodge_no", goLeftNo);// bunlar� update �a��r�yosan pek elveri�li de�il!
-
-
-        // moveForward = GameObject.Find("empty ball").GetComponent<MoveForward>();        
+        spriteFlipper.FlipToRight();
     }
 
 
-    void Update()
+    void Update() // update yap�lcak!
     {
-        
-    }
+        EgoistInputs(); // bunun için ayrı bir class açılabilir ama vakit alıcağından şuanlık tercih etmiyorum.
 
-
-    private void LateUpdate() // update yap�lcak!
-    {
-        EgoistInputs();
-
-        if (haveBall)
+        if (HaveBall)
         {
             EgoistDribble();
         }
@@ -76,140 +59,10 @@ public class PlayerController : MonoBehaviour
             EgoistSprint();
         }
     }
-    
-    private void OnTriggerStay2D(Collider2D col)
-    {
-        if (col.gameObject.CompareTag("defender_body")) // defenderlar�n isTrigger a��k.
-        {
-            if (!haveBall && !shoulderContestOn)
-            {
-                // animation event works here!
-
-                // rightDef = GameObject.Find("defender right");
-                // leftDef = GameObject.Find("defender left");
-
-                collideDef = col.gameObject;
-                defenderShoulder = collideDef.GetComponent<DefenderShoulder>();        
-
-                if (IsDefOnLeft())
-                {
-                    // defender soldaysa                    
-                    playerAnim.SetFloat("def_onleft", 1f);                   
-                }
-                else
-                {
-                    // defender sa�daysa
-                    playerAnim.SetFloat("def_onleft", 0f);
-                }
-
-                playerAnim.ResetTrigger("sprint");
-                playerAnim.SetBool("shoulder_contest", true);
-                shoulderContestOn = true;
-            }
-            
-
-            /*else if (haveBall)
-            {
-                playerAnim.SetTrigger("Avoid"); // bunu defender�n tackle yapt��� ve freeball an�nda aktifle�tirmek daha mant�kl� farkl� bir child collider gerek // egoistten rb ��kar�nca do�ru �al��t�.
-                Debug.Log("Avoid");
-            }  // avoid d�zg�n �al��m�yor o y�zden iptal ettim.*/
-        }               
-    }
-
-
-    private void OnTriggerEnter2D(Collider2D col)
-    {
-        if (col.gameObject.CompareTag("tackle collider"))
-        {
-            if (!haveBall && !shoulderContestOn)
-            {
-                playerAnim.SetTrigger("avoid");
-                Debug.Log("avoid çağrıldı");
-            }
-            
-        }
-        
-        if (col.gameObject.CompareTag("ball"))
-        {
-            haveBall = true;
-            playerAnim.ResetTrigger("sprint");
-            playerAnim.SetTrigger("dribble");
-            
-            if (shoulderContestOn == true)
-            {
-                /*
-                if (defenderShoulder == leftDef) // delegasyon yapılır mı diye bir bak.
-                {
-                    if (IsDefOnLeft())
-                    {
-                        // defender soldaysa
-                        // Debug.Log("fall anim on");
-                        // defAnim.SetFloat("Fall_to_left", 1f);
-                        // leftDfalling = true;
-
-                        shContestloserPosition.x = transform.position.x - 0.8f;
-                        shContestloserPosition.y = transform.position.y - 0.2f;
-                        shContestloserPosition.z = 6;
-                    }
-                    else
-                    {
-                        // defender sa�daysa Debug.Log("fall anim on");
-                        // defAnim.SetFloat("Fall_to_left", 0f);
-                        // leftDfalling = true;
-
-                        shContestloserPosition.x = transform.position.x + 0.8f;
-                        shContestloserPosition.y = transform.position.y - 0.2f;
-                        shContestloserPosition.z = 6;
-                    }
-                }
-
-                if (defenderShoulder == rightDef)
-                {                    
-                    if (IsDefOnLeft())
-                    {
-                        // defender soldaysa
-                        // Debug.Log("fall anim on");
-                        // transform.localScale = new Vector3(-1f, 1f, 1f); bunu kullan animasyonlar� mirrorlamak i�in
-                        // defAnim.SetFloat("Fall_to_left", 1f);
-                        // rightDfalling = true;
-
-                        shContestloserPosition.x = transform.position.x - 0.8f;
-                        shContestloserPosition.y = transform.position.y - 0.2f;
-                        shContestloserPosition.z = 6;
-                    }
-                    else
-                    {
-                        // defender sa�daysa
-                        // Debug.Log("fall anim on");
-                        // defAnim.SetFloat("Fall_to_left", 0f);
-                        // rightDfalling = true;
-
-                        shContestloserPosition.x = transform.position.x + 0.8f;
-                        shContestloserPosition.y = transform.position.y - 0.2f;
-                        shContestloserPosition.z = 6;
-                    }
-                }
-                */
-                
-                
-                playerAnim.SetBool("shoulder_contest", false);
-                shoulderContestOn = false;
-                defenderShoulder.EndShoulderContest();
-            }
-        }
-    }
-
-    public void SetDefInActive() // delegasyon yapılır mı diye bir bak.
-    {
-        if (shoulderContestOn == true)
-        {
-            defenderShoulder.StartShoulderContest(IsDefOnLeft());
-        }
-    }
 
 
     private void EgoistInputs()
-    {
+    {/*
         if (RDefenderController.getPositionedR || LDefenderController.getPositionedL) // sag savunma pozisyon almamis ise saga kayma yapilabilsin.
         {
             fakeButton.interactable = true;
@@ -226,7 +79,7 @@ public class PlayerController : MonoBehaviour
                 transform.localScale = new Vector3(-1f, 1f, 1f);
                 playerAnim.SetTrigger("dodge"); // Go_right olarak de�i�tirilip blend tree yap�l�cak.
 
-                if (shoot) // bunları buraya koymaya gerek yok!
+                if (shoot) // bunu BallControllerdan çağırman gerekirdi.
                 {
                     moveForward.spinToRight = true;
                 }
@@ -236,7 +89,7 @@ public class PlayerController : MonoBehaviour
                 transform.localScale = new Vector3(1f, 1f, 1f);
                 playerAnim.SetTrigger("dodge");
 
-                if (shoot)
+                if (shoot) // bunu BallControllerdan çağırman gerekirdi.
                 {
                     moveForward.spinToLeft = true;
                     // ball.transform.Translate(0.2f, 0, 0);
@@ -248,7 +101,7 @@ public class PlayerController : MonoBehaviour
                 transform.localScale = new Vector3(-1f, 1f, 1f);
                 playerAnim.SetTrigger("dodge"); // Go_right olarak de�i�tirilip blend tree yap�l�cak.
 
-                if (shoot)
+                if (shoot) // bunu BallControllerdan çağırman gerekirdi.
                 {
                     moveForward.spinToRight = true;
                 }
@@ -258,7 +111,7 @@ public class PlayerController : MonoBehaviour
                 transform.localScale = new Vector3(1f, 1f, 1f);
                 playerAnim.SetTrigger("dodge");
 
-                if (shoot)
+                if (shoot) // bunu BallControllerdan çağırman gerekirdi.
                 {
                     moveForward.spinToLeft = true;
                     // ball.transform.Translate(0.2f, 0, 0);
@@ -275,7 +128,7 @@ public class PlayerController : MonoBehaviour
                 playerAnim.SetTrigger("fake");
                 rDefenderController.Steal();
 
-                if (shoot)
+                if (shoot) // bunu BallControllerdan çağırman gerekirdi.
                 {
                    moveForward.spinToRight = true;
                 }             
@@ -287,126 +140,179 @@ public class PlayerController : MonoBehaviour
                 lDefenderController.Steal();
                 // transform.localScale = new Vector3(-1f, 1f, 1f);
 
-                if (shoot)
+                if (shoot) // bunu BallControllerdan çağırman gerekirdi.
                 {
                     moveForward.spinToLeft = true;
 
                 }
             }
-        }
+        }*/
 
-        if (Input.GetMouseButtonDown(0) && haveBall && !IsPointerOverUIObject() && Time.timeScale == 1)
+
+        if (Input.GetMouseButtonDown(0) && HaveBall && !IsPointerOverUIObject() && Time.timeScale == 1)
         {
             AimCalculator();
-
-            if (goal.activeInHierarchy)
+            if (IsAimOnGoal())
             {
-                if (goal.transform.position.y - 6 > aim.y)
-                {
-                    shoot = false;
-
-                    transform.localScale = new Vector3(1f, 1f, 1f);
-                    playerAnim.SetTrigger("self_pass");
-                    playerAnim.ResetTrigger("dribble");
-
-                }
-                else if (goal.transform.position.y - 6 <= aim.y)
-                {                   
-                    shoot = true;
-
-                    transform.localScale = new Vector3(1f, 1f, 1f);
-                    playerAnim.SetTrigger("shoot");
-                    playerAnim.ResetTrigger("dribble");
-
-                }
-           
+                Shoot();
             }
             else
             {
-                shoot = false;
+                Pass();
+            }
+        }
+    }
 
-                transform.localScale = new Vector3(1f, 1f, 1f);
-                playerAnim.SetTrigger("self_pass");
-                playerAnim.ResetTrigger("dribble");
 
+    private void OnTriggerStay2D(Collider2D col) // ShoulderContest
+    {
+        if (col.gameObject.CompareTag("defender_body")) // defenderlarin isTrigger acik.
+        {
+            if (!HaveBall && !shoulderContestOn)
+            {
+                // animation event works here!                
+
+                collideDef = col.gameObject;
+                defenderShoulder = collideDef.GetComponent<DefenderShoulder>();        
+
+                if (IsDefOnLeft())
+                {
+                    // defender soldaysa                    
+                    playerAnim.SetFloat("def_onleft", 1f);  // bunu scale kullanarak ayarlarsın ama forma numarasını kaldırman gerekicek.Böyle kalırsa daha iyi gibi.                 
+                }
+                else
+                {
+                    // defender sa�daysa
+                    playerAnim.SetFloat("def_onleft", 0f);
+                }
+
+                playerAnim.ResetTrigger("sprint");
+                playerAnim.SetBool("shoulder_contest", true);
+                shoulderContestOn = true;
+            }
+        }               
+    }
+
+
+    private void OnTriggerEnter2D(Collider2D col) // Avoid, HaveBall
+    {
+        if (col.gameObject.CompareTag("tackle collider"))
+        {
+            if (!HaveBall && !shoulderContestOn)
+            {
+                playerAnim.SetTrigger("avoid");
+            }
+        }
+        
+        if (col.gameObject.CompareTag("ball"))
+        {
+            HaveBall = true;
+            
+            if (shoulderContestOn == true)
+            {
+                playerAnim.SetBool("shoulder_contest", false);
+                shoulderContestOn = false;
+                defenderShoulder.EndShoulderContest();
+            }
+        }
+    } 
+
+    public void PassBall() // ı call this with animation event.
+    {
+        ballController.Passed(aim);
+        HaveBall = false;
+    }
+
+    public void ShootBall() // ı call this with animation event.
+    {
+        ballController.Shooted(aim);
+        HaveBall = false;
+    }
+
+    public void SetDefInActive()
+    {
+        if (shoulderContestOn == true)
+        {
+            defenderShoulder.StartShoulderContest(IsDefOnLeft());
+        }
+    }
+
+    private bool IsAimOnGoal()
+    {
+        if (goal.activeInHierarchy)
+        {
+            if (goal.transform.position.y - 6 > aim.y) 
+            {
+                return false;
+            }
+            else
+            {
+                return true;
             }
 
         }
+        else
+        {
+            return false;
+        }
+    }
 
+    private void AimCalculator()
+    {
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePos.z = 1;
+        aim = mousePos;
+    }
+
+    private void Shoot()
+    {
+        // transform.localScale = new Vector3(1f, 1f, 1f);
+        playerAnim.SetTrigger("shoot");
+        playerAnim.ResetTrigger("dribble");
+    }
+
+    private void Pass()
+    {
+        // transform.localScale = new Vector3(1f, 1f, 1f);
+        playerAnim.SetTrigger("self_pass");
+        playerAnim.ResetTrigger("dribble");
+    }
+
+    private bool IsDefOnLeft()
+    {
+        Vector3 defVector = collideDef.transform.position - transform.position;
+        Vector3 forwardVector = Vector3.forward;
+        float angle = Vector3.SignedAngle(defVector, forwardVector, Vector3.up);
+
+        return angle > 0;
     }
 
 
     private void EgoistSprint()
     {
-        transform.localScale = new Vector3(1f, 1f, 1f);
+        spriteFlipper.FlipToRight();
+
+        // transform.localScale = new Vector3(1f, 1f, 1f);
 
         playerAnim.SetTrigger("sprint");
         playerAnim.ResetTrigger("dribble");
 
-        Vector3 lookdirection = ball.transform.position - transform.position; //normalized gelebilir.                           
-        Quaternion rotationToBall = Quaternion.LookRotation(Vector3.forward, lookdirection);
-
-        transform.rotation = rotationToBall;
-        
-
-        if (shoulderContestOn)
-        {
-            transform.Translate(Vector3.up * Time.deltaTime * shContestSpeed);
-        }
-        else
-        {
-            transform.Translate(Vector3.up * Time.deltaTime * sprintSpeed);
-        }
+        movementController.MoveToAim(ball.transform.position, shoulderContestOn ? attributeSettings.SholContestSpeed : attributeSettings.SprintSpeed);       
     }
-
+       
 
     private void EgoistDribble()
     {
         // transform.localScale = new Vector3(1f, 1f, 1f); buraya koyarsan dodgelara da etki ediyor
-                
-        playerAnim.SetTrigger("dribble");
+
+        playerAnim.ResetTrigger("sprint");
+        playerAnim.SetTrigger("dribble"); // animation has a movement in itself.
         transform.rotation = rotationToUp;
     }
 
+    
 
-    private bool IsDefOnLeft()
-    {
-        defVector = collideDef.transform.position - transform.position;
-        forwardVector = Vector3.forward;       
-        angle = Vector3.SignedAngle(defVector, forwardVector, Vector3.up);
-
-        /* print(angle);
-        // def soldaysa pozitif a��
-
-        if (angle > 0)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }*/
-
-        return angle > 0; // burayı kontrol etmedim oyunda sorun varsa geri düzelt.
-    }
-
-
-    private void HavenotBall()
-    {
-        haveBall = false;
-        moveForward.SendBall();
-    }
-
-
-    private void AimCalculator()
-    {
-        mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePos.z = 1;
-        aim = mousePos;
-
-    }
-
-
+    /*
     public void GoRight()
     {
         if (haveBall)
@@ -475,7 +381,7 @@ public class PlayerController : MonoBehaviour
         }           
 
     }*/
-
+    /*
     public void FakeRight()
     {
         if (haveBall && RDefenderController.getPositionedR)
@@ -496,7 +402,7 @@ public class PlayerController : MonoBehaviour
             playerAnim.SetTrigger("fake"); // Fake_left olarak de�i�tirilip blend tree yap�l�cak.                        
             lDefenderController.Steal();
         }
-    }
+    }*/
 
     /*
     public void FakeLeft()

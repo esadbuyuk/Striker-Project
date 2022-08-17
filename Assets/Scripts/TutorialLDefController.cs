@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine.EventSystems;
 
 public class TutorialLDefController : MonoBehaviour
-{
+{/*
     private Animator leftDefenderAnim;
     // public static bool getPositionedL = false;
     private int stealTime;
@@ -250,7 +250,7 @@ public class TutorialLDefController : MonoBehaviour
             {
                 // StartCoroutine(StunCountdownRoutine(0.5f));                
             }
-            */
+            *//*
             if (!coroutineStarted) // countdown ba�lamad�ysa
             {
                 StartCoroutine(StealCountdownRoutine());
@@ -453,5 +453,5 @@ public class TutorialLDefController : MonoBehaviour
     private void ErrorDetector()
     {
         Debug.Log("animation called!");
-    }
+    }*/
 }

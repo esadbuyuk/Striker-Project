@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 
 public class TimerSliderController : MonoBehaviour
-{
+{/*
     private Animator leftDefenderAnim;
     public bool getPositionedL = false; // bu static idi bozuktu değiştirdin.
     private int stealTime;
@@ -224,7 +224,7 @@ public class TimerSliderController : MonoBehaviour
             {
                 // StartCoroutine(StunCountdownRoutine(0.5f));                
             }
-            */
+            *//*
             if (!coroutineStarted) // countdown baslamadiysa
             {
                 StartCoroutine(StealCountdownRoutine());
@@ -446,5 +446,5 @@ public class TimerSliderController : MonoBehaviour
     private void ErrorDetector()
     {
         Debug.Log("animation called!");
-    }
+    }*/
 }

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public class TestTouch : MonoBehaviour
-{
+{/*
 
     private InputManager inputManager;
     private Camera cameraMain;
@@ -28,5 +28,5 @@ public class TestTouch : MonoBehaviour
         Vector3 worldCoordinates = cameraMain.ScreenToWorldPoint(screenCoordinates);
         worldCoordinates.z = 0;
         transform.position = worldCoordinates;
-    }
+    }*/
 }

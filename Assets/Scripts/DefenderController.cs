@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -7,12 +5,14 @@ public class DefenderController : MonoBehaviour
 {
     private DefenderTypeChooser defenderTypeChooser;
     private SliderBehaviour sliderBehaviour;
-    private TimerBehaviour timerBehaviour;
+    // private TimerBehaviour timerBehaviour;
     private Animator defenderAnim;
     private DefenderShoulder defenderShoulder;
     private DestroyOutOfBounds destroyOutOfBounds;
-    public TextMeshProUGUI dangerText;
+    [SerializeField]
+    private TextMeshProUGUI dangerText;
     private SpriteRenderer mySpriteRenderer;
+    private ITimerBehaviour timerBehaviour;
 
 
 
@@ -22,9 +22,7 @@ public class DefenderController : MonoBehaviour
         {
             defenderAnim.SetTrigger("Sprint");            
             dangerText.gameObject.SetActive(false);
-
             defenderTypeChooser.ReselectDefenderType();
-
             if (mySpriteRenderer != null)
             {
                 // flip the sprite
@@ -44,7 +42,7 @@ public class DefenderController : MonoBehaviour
 
         defenderTypeChooser = GetComponent<DefenderTypeChooser>();
         sliderBehaviour = GetComponent<SliderBehaviour>();
-        timerBehaviour = GetComponent<TimerBehaviour>();
+        timerBehaviour = GetComponent<ITimerBehaviour>();
     }
 
     // Start is called before the first frame update
@@ -61,11 +59,6 @@ public class DefenderController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-    }
-
-    void LateUpdate()
-    {
         if (defenderShoulder.Falled)
         {
             // bu koşulda aşağıdakiler geçersiz kalsın.
@@ -79,5 +72,10 @@ public class DefenderController : MonoBehaviour
         {
             timerBehaviour.ActivateTimerBehaviour();
         }
+    }
+
+    void LateUpdate()
+    {
+        
     }
 }

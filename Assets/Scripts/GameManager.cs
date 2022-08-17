@@ -3,33 +3,50 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
-
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public TextMeshProUGUI scoreText;
-    public TextMeshProUGUI highscoreText;
+    [SerializeField]
+    private TextMeshProUGUI scoreText;
+    [SerializeField]
+    private TextMeshProUGUI highscoreText;
     private int score;
     public static int highscore = 0;
-    private bool routinCompleted = true;
-    public TextMeshProUGUI destroyedtext;
-    public GameObject rDef;
-    public GameObject lDef;
-    private DestroyOutOfBounds destroyOutOfBoundsL;
-    private DestroyOutOfBounds destroyOutOfBoundsR;
-    private int destroyedCount = 0;   
-    public GameObject[] tipTexts;
-
+    [SerializeField]
+    private TextMeshProUGUI destroyedtext;
+    [SerializeField]
+    private GameObject rDef;
+    [SerializeField]
+    private GameObject lDef;
+    private int destroyedCount = 0;
+    [SerializeField]
+    private GameObject[] tipTexts;
+    private GameObject timerManager;
+    private Coroutine coroutine;
+    [SerializeField]
+    private TextMeshProUGUI gameOverText;
+    [SerializeField]
+    private Button restartButton;
+    [SerializeField]
+    private TextMeshProUGUI nutmegtext;
+    [SerializeField]
+    private TextMeshProUGUI goaltext;
 
     // Start is called before the first frame update
+
+
+    private void Awake()
+    {
+        timerManager = GameObject.Find("TimerManager");
+        coroutine = timerManager.GetComponent<Coroutine>();
+    }
     void Start()
     {
-        UpdateScore(0);       
-
-        destroyOutOfBoundsR = rDef.GetComponent<DestroyOutOfBounds>();
-        destroyOutOfBoundsL = lDef.GetComponent<DestroyOutOfBounds>();
-
+        UpdateScore(0);
+        StartCoroutine(AddScoreEverySecond(0.1f)); // kontrol edilmedi.
         // SceneManager.LoadScene("MyMainMenu");
+        // coroutine.StartFunctionTimer(UpdateScore(1), 1); // dont know why tis dont work.
 
     }
 
@@ -40,43 +57,7 @@ public class GameManager : MonoBehaviour
         {
             CalculateHighscore();
         }
-        
-
-        if (routinCompleted)
-        {
-            StartCoroutine(AddScoreEverySecond(0.1f));
-        }
-
-        if (destroyOutOfBoundsR.destroyed)
-        {
-            destroyOutOfBoundsR.destroyed = false;
-
-            destroyedCount += 1;
-            if (destroyedCount > 2)
-            {
-                UpdateScore(50);
-                destroyedtext.gameObject.SetActive(true);
-                StartCoroutine(RemoveAfterSeconds(1, destroyedtext.gameObject));
-
-            }
-            
-        }
-
-        if (destroyOutOfBoundsL.destroyed)
-        {
-            destroyOutOfBoundsL.destroyed = false;
-
-            destroyedCount += 1;
-            if (destroyedCount > 2)
-            {
-                UpdateScore(50);
-                destroyedtext.gameObject.SetActive(true);
-                StartCoroutine(RemoveAfterSeconds(1, destroyedtext.gameObject));
-
-            }
-
-        }
-
+              
         if (SceneManager.GetActiveScene().name == "SurvivalTutorial")
         {
             if (Time.timeScale == 0)
@@ -94,6 +75,31 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void DefenderDestroyed() // kontrol edilmedi.
+    {
+        destroyedCount += 1;
+        if (destroyedCount > 2)
+        {
+            UpdateScore(50);
+            destroyedtext.gameObject.SetActive(true);
+            StartCoroutine(RemoveAfterSeconds(1, destroyedtext.gameObject));
+        }
+    }    
+
+    public void Nutmeg()
+    {
+        UpdateScore(50);
+        nutmegtext.gameObject.SetActive(true);
+        StartCoroutine(RemoveAfterSeconds(1, nutmegtext.gameObject)); // 0.0f de�i�tirilebilir!
+    }
+
+    public void Goal()
+    {
+        UpdateScore(500);
+        goaltext.gameObject.SetActive(true);
+        StartCoroutine(RemoveAfterSeconds(1.5f, goaltext.gameObject));
+    }
+
     public void UpdateScore(int scoreToAdd)
     {
         score += scoreToAdd;
@@ -106,9 +112,7 @@ public class GameManager : MonoBehaviour
         {
             highscore = score;            
         }
-
         highscoreText.text = "Highscore: " + highscore;
-
     }
 
     public void RestartGame()
@@ -127,12 +131,20 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1;
     }
 
+    public void GameOver()
+    {
+        gameOverText.gameObject.SetActive(true);
+        restartButton.gameObject.SetActive(true);
+        highscoreText.gameObject.SetActive(true);
+
+        Time.timeScale = 0;
+    }
+
     IEnumerator AddScoreEverySecond(float seconds)
     {
-        routinCompleted = false;
         yield return new WaitForSeconds(seconds);
         UpdateScore(1);
-        routinCompleted = true;
+        StartCoroutine(AddScoreEverySecond(0.1f));
     }
 
     public IEnumerator RemoveAfterSeconds(float seconds, GameObject obj)

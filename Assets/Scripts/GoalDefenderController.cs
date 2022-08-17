@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 
 public class GoalDefenderController : MonoBehaviour
-{
+{/*
    
     private Animator leftDefenderAnim;
     public static bool getPositionedG = false;     
@@ -203,5 +203,5 @@ public class GoalDefenderController : MonoBehaviour
     private void ErrorDetector()
     {
         Debug.Log("animation called!");
-    }
+    }*/
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
-{
+{/*
     public GameObject[] defenderPrefabs;
     public new GameObject camera;
     private Vector3 instantiateOffsetR;
@@ -200,5 +200,5 @@ public class SpawnManager : MonoBehaviour
         spawnPosL = camera.transform.position + instantiateOffsetL;
 
         return spawnPosL;
-    }
+    }*/
 }

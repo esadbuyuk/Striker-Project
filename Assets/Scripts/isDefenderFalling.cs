@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class isDefenderFalling : MonoBehaviour
-{
+{/*
     public string defenderName;
     private PlayerController playerController;
     private DestroyOutOfBounds destroyOutOfBounds;
@@ -58,5 +58,5 @@ public class isDefenderFalling : MonoBehaviour
                 done = false;
             }
         }
-    }
+    }*/
 }

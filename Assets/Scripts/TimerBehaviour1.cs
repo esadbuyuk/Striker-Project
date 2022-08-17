@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class TimerBehaviour : MonoBehaviour, ITimerBehaviour
+public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
 {
     private DefenderShoulder defenderShoulder;
     private bool getPositioned = false;
@@ -20,7 +20,7 @@ public class TimerBehaviour : MonoBehaviour, ITimerBehaviour
     [SerializeField] GameObject ball;
     private float sprintSpeed = 5.0f;
     // public Vector3 positionOffset;
-    private Vector3 position;    
+    private Vector3 position;
     // private float onPositionSpeed = 2.5f;   
     // private PlayerController playerController;
     // private Quaternion firstRot;
@@ -32,6 +32,9 @@ public class TimerBehaviour : MonoBehaviour, ITimerBehaviour
     private int collide_count = 0;
     //private bool timer = false;
     // public bool defenderIsFalling = false;
+    private MovementController movementController;
+    [SerializeField] private AttributeSettings attributeSettings;
+
 
     void OnDisable()
     {
@@ -52,9 +55,9 @@ public class TimerBehaviour : MonoBehaviour, ITimerBehaviour
         defenderShoulder = gameObject.GetComponent<DefenderShoulder>();
         defenderAnim = gameObject.GetComponent<Animator>();
         playerController = GameObject.Find("egoist").GetComponent<PlayerController>();
-
+        movementController = new MovementController(transform, attributeSettings);
     }
-        
+
 
     public void ActivateTimerBehaviour()
     {
@@ -138,7 +141,6 @@ public class TimerBehaviour : MonoBehaviour, ITimerBehaviour
         if (Input.GetMouseButtonDown(0) && playerController.HaveBall && !IsPointerOverUIObject() && Time.timeScale == 1)
         {
             pressToBall = true;
-
         }
     }
 
@@ -156,30 +158,18 @@ public class TimerBehaviour : MonoBehaviour, ITimerBehaviour
     private void RunToBall() // bunları movementControllerdan çağır.
     {
         getPositioned = false;
-
         ignoreCountdown = true;
-
-        Vector3 lookdirection = ball.transform.position - transform.position; // normalized gelebilir.                           
-        Quaternion rotation = Quaternion.LookRotation(Vector3.forward, lookdirection);
-
-        transform.rotation = rotation;
-        transform.Translate(sprintSpeed * Time.deltaTime * Vector3.up);
+        movementController.MoveToAim(ball.transform.position, attributeSettings.SprintSpeed);
     }
 
 
     private void RunToPosition() // bunları movementControllerdan çağır.
     {
         getPositioned = false;
-
         collide_count = 0;
         PositionCalculator();
         ignoreCountdown = true;
-
-        Vector3 lookdirection = position - transform.position;
-        Quaternion rotation = Quaternion.LookRotation(Vector3.forward, lookdirection);
-
-        transform.rotation = rotation;
-        transform.Translate(sprintSpeed * Time.deltaTime * Vector3.up);
+        movementController.MoveToAim(position, attributeSettings.SprintSpeed);        
     }
 
     private Vector3 PositionCalculator()
@@ -193,7 +183,7 @@ public class TimerBehaviour : MonoBehaviour, ITimerBehaviour
     private void StayOnPosition()
     {
         PositionCalculator();
-        transform.SetPositionAndRotation(position, posCollider.transform.rotation);// Quaternion.Euler(0, 0, -45));
+        transform.SetPositionAndRotation(position, posCollider.transform.rotation);
 
         // transform.Translate(onPositionSpeed * Time.deltaTime * Vector3.up, Space.World);
         /*if (rightDefenderAnim.GetCurrentAnimatorStateInfo(0).IsName("runback_right"))
@@ -225,7 +215,7 @@ public class TimerBehaviour : MonoBehaviour, ITimerBehaviour
 
 
     // Bu fonksiyonu playerControllerdan çağırman gerek!
-    public void Steal()
+    public void Steal() // bunları movementControllerdan çağır.
     {
         if (getPositioned)
         {

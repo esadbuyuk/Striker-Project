@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 public class LDefenderController : MonoBehaviour
-{
+{/*
     private Animator leftDefenderAnim;
     public static bool getPositionedL = false;
     private int stealTime;
@@ -256,7 +256,7 @@ public class LDefenderController : MonoBehaviour
             {
                 // StartCoroutine(StunCountdownRoutine(0.5f));                
             }
-            */
+            *//*
             if (!coroutineStarted) // countdown ba�lamad�ysa
             {
                 StartCoroutine(StealCountdownRoutine());
@@ -478,5 +478,5 @@ public class LDefenderController : MonoBehaviour
     private void ErrorDetector()
     {
         Debug.Log("animation called!");
-    }
+    }*/
 }

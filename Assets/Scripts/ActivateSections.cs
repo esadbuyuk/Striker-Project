@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class ActivateSections : MonoBehaviour
 {
-    public GameObject[] wantedSectionsList;
-    public GameObject[] currentSectionsList;
+    [SerializeField]
+    private GameObject[] wantedSectionsList;
+    [SerializeField]
+    private GameObject[] currentSectionsList;
     private int activatingTurn = 0;
 
 

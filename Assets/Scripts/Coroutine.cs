@@ -5,15 +5,15 @@ using UnityEngine;
 
 public class Coroutine : MonoBehaviour
 {
-    IEnumerator Timer(Action function, int seconds)
+    IEnumerator FunctionTimer(Action function, int seconds)
     {        
         yield return new WaitForSeconds(seconds);        
         
         function?.Invoke();
     }
 
-    public void StartTimer(Action function, int seconds)
+    public void StartFunctionTimer(Action function, int seconds)
     {
-        StartCoroutine(Timer(function, seconds));
+        StartCoroutine(FunctionTimer(function, seconds));
     }
 }

@@ -6,9 +6,8 @@ using UnityEngine.SceneManagement;
 public class DefenderTypeChooser : MonoBehaviour
 {    
     private int defenderType;
-    public bool slider;
-    public bool timer;
-    // private int stealTime;
+    public bool slider { get; private set; }
+    public bool timer { get; private set; }
     private DestroyOutOfBounds destroyOutOfBounds;
 
 
@@ -46,13 +45,6 @@ public class DefenderTypeChooser : MonoBehaviour
             // Debug.Log("steal time for " + this.gameObject.name);
         }
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
 
     public void ReselectDefenderType()
     {        

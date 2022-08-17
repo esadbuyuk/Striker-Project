@@ -2,21 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpriteFlipper : MonoBehaviour
+public class SpriteFlipper
 {
-    // variable to hold a reference to our SpriteRenderer component
-    private SpriteRenderer mySpriteRenderer;
+    private readonly Transform transformToFlip;
 
-    // This function is called just one time by Unity the moment the component loads
-    private void Awake()
+    public SpriteFlipper(Transform transformToFlip)
     {
-        // get a reference to the SpriteRenderer component on this gameObject
-        mySpriteRenderer = GetComponent<SpriteRenderer>();
+        this.transformToFlip = transformToFlip;
+    }
+    
+
+    public void FlipToRight()
+    {
+        transformToFlip.localScale = new Vector3(1f, 1f, 1f);
     }
 
-    // This function is called by Unity every frame the component is enabled
-    private void Update()
-    {       
-        
+
+    public void FlipToLeft()
+    {
+        transformToFlip.localScale = new Vector3(-1f, 1f, 1f);
     }
 }

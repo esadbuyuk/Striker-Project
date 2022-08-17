@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DefenderShoulder : MonoBehaviour
@@ -10,7 +8,6 @@ public class DefenderShoulder : MonoBehaviour
     [SerializeField] private GameObject dangerText;
     private GameObject striker;
     private bool fallLeft;
-
     public bool Falled { get; private set; }
 
     void OnDisable()

@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 
 public class TutorialSpawnManager : MonoBehaviour
-{
+{/*
     public GameObject[] defenderPrefabs;
     public new GameObject camera;
     private Vector3 instantiateOffsetR;
@@ -175,5 +175,5 @@ public class TutorialSpawnManager : MonoBehaviour
     {
         Time.timeScale = 0;
         // gameStopped = true; // I prefer to do this on GameManager script
-    }
+    }*/
 }

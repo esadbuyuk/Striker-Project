@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ShoulderContest : MonoBehaviour
 {
+    /*
     private bool shoulderContestOn = false;
     public Animator defenderAnim;
     private GameObject egoist;
@@ -79,7 +80,7 @@ public class ShoulderContest : MonoBehaviour
             {
                 playerAnim.SetTrigger("Avoid"); // bunu defenderin tackle yapt��� ve freeball aninda aktiflestirmek daha mantikli farkli bir child collider gerek // egoistten rb cikarinca dogru calisti.
                 Debug.Log("Avoid");
-            } */ // avoid duzgun calismiyor o yuzden iptal ettim.
+            }  // avoid duzgun calismiyor o yuzden iptal ettim.
         }
     }
 
@@ -155,9 +156,10 @@ public class ShoulderContest : MonoBehaviour
         else
         {
             return false;
-        }*/
+        }
 
         // def soldaysa pozitif a��
         return angle > 0; // burayı kontrol etmedim oyunda sorun varsa geri düzelt.
     }
+*/
 }

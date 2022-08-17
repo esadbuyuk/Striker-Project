@@ -36,7 +36,7 @@ public class ModelController : MonoBehaviour
     {
         transform.position = firstPos;
         transform.rotation = firstRot;
-        modelAnim.SetFloat("Goleft_no", PlayerController.goLeftNo);
+        // modelAnim.SetFloat("Goleft_no", PlayerController.goLeftNo); 
         modelAnim.SetTrigger("Go_left");
         // modelAnim.ResetTrigger("Go_left");
     }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class AnimTreeSelector : MonoBehaviour
-{
+{/*
     // Start is called before the first frame update
     void Start()
     {
@@ -24,5 +24,5 @@ public class AnimTreeSelector : MonoBehaviour
     public void SetShift()
     {
         PlayerController.goLeftNo = 1;
-    }
+    }*/
 }

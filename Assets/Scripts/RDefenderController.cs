@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 public class RDefenderController : MonoBehaviour
-{
+{/*
     private Animator rightDefenderAnim;
     public static bool getPositionedR = false;
     private int stealTime;
@@ -243,7 +243,7 @@ public class RDefenderController : MonoBehaviour
             {
                 // StartCoroutine(StunCountdownRoutine(0.5f));                
             }
-            */
+            *//*
             if (!coroutineStarted) // countdown ba�lamad�ysa
             {
                 StartCoroutine(StealCountdownRoutine());
@@ -385,7 +385,7 @@ public class RDefenderController : MonoBehaviour
         /*if (rightDefenderAnim.GetCurrentAnimatorStateInfo(0).IsName("runback_right"))
         {
             rightDefenderAnim.SetBool("Runback", false); // bu ko�uldan kurtul
-        }*/
+        }*//*
     }
 
 
@@ -457,5 +457,5 @@ public class RDefenderController : MonoBehaviour
         Time.timeScale = 0;
         // gameStopped = true;
     }
-
+*/
 }

@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 [DefaultExecutionOrder(-1)]
 public class InputManager : Singleton<InputManager>
 {
+    /*
     private TouchControls touchControls;
     
     public delegate void StartTouchEvent(Vector2 position, float time);
@@ -43,6 +44,6 @@ public class InputManager : Singleton<InputManager>
         Debug.Log("Touch ended" + touchControls.Touch1.TouchPosition.ReadValue<Vector2>());
         if (OnEndTouch != null) OnEndTouch(touchControls.Touch1.TouchPosition.ReadValue<Vector2>(), (float)context.time);
     }
-
+    */
 }
 

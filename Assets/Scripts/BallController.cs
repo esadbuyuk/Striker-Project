@@ -7,26 +7,23 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 
-public class MoveForward : MonoBehaviour
-{
-    /* 
+public class BallController : MonoBehaviour
+{    
     private readonly float forwardSpeed = 15f;
     private float shootSpeed = 20f; // you checked the full kinematic contacts and continues detection in ball rb. // StrikerDesign ı duzelt
+    private float spinSpeed = 1;
+
     private Vector3 shootDirection;
     private Animator ballAnim;
     private GameObject egoist;
-    [SerializeField] private Vector3 ballOffset;
-    private Camera cameraMain;
+    [SerializeField] private Vector3 ballOffset = new Vector3(0.100000001f, 0.100000001f, 2);
     private Quaternion rotationToUp;
-    private Vector3 mousePos;
     private GameManager gameManager;
     private GameObject goal;
-    public Vector3 Aim { get; private set; }
-    private bool stopBall = false;
+    private Vector3 aim;
     private int gollednum = 0;
     private bool spinToRight = false;
     private bool spinToLeft = false;
-    // [SerializeField] private TextMeshProUGUI highscoreText;
     private bool alreadyDone = false;
     [SerializeField] private TextMeshProUGUI tipText7;
     [SerializeField] private TextMeshProUGUI tipClick7;
@@ -35,18 +32,16 @@ public class MoveForward : MonoBehaviour
     [SerializeField] private GameObject spawnManager;
     private SpawnManager2 spawnManager2;
     private GoalKeeperController goalKeeperController;
-    // [SerializeField] private AttributeSettings attributeSettings;
     private MovementController movementController;
-    private bool move;
-    private PlayerController playerController;
+    private bool shoot;
+    private bool pass;
+    private bool stop;
 
     private void Awake()
     {
-        cameraMain = Camera.main;
         spawnManager2 = spawnManager.GetComponent<SpawnManager2>();
         ballAnim = GetComponent<Animator>();
         egoist = GameObject.Find("egoist");
-        playerController = egoist.GetComponent<PlayerController>();
         goal = GameObject.Find("goal");
         goalKeeperController = GameObject.Find("goalkeeper").GetComponent<GoalKeeperController>();
         movementController = new MovementController(transform, null);
@@ -58,115 +53,22 @@ public class MoveForward : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "SurvivalTutorial")
         {
             shootSpeed = 20f;
-        }        
+        }
         goal.SetActive(false); // activeInHirearchy fonksiyonunu kullanabilmem icin gerekli        
         rotationToUp = transform.rotation;
     }
 
 
-    void Update() // burda lateUpdate kullanabilicegin bir yol dusun.
+    void LateUpdate()
     {
-        if (Input.GetMouseButtonDown(0) && playerController.HaveBall && !IsPointerOverUIObject() && Time.timeScale == 1) // bunu kapsülden çekiceksin: haveBall
+        if (stop)
         {
-            move = true;
-            AimCalculator();
+
         }
-
-        if (move & stopBall)
+        else if (shoot)
         {
-            MoveToAim();
-
-            if (spinToRight)
-            {
-                transform.Translate(new Vector3(3f, 0f, 0f) * Time.deltaTime);
-            }
-
-            if (spinToLeft)
-            {
-                transform.Translate(new Vector3(-3f, 0f, 0f) * Time.deltaTime);
-            }
-        }
-        else
-        {
-            Noneless();
-            stopBall = false;
-            gollednum = 0;            
-        }
-    } 
-
-
-    private void OnTriggerEnter2D(Collider2D col)
-    {
-        if (col.gameObject.CompareTag("egoist"))
-        {
-            move = false;
-            Debug.Log("Burası çalıştı.");
-        }
-
-        if (col.gameObject.CompareTag("goal"))
-        {
-            spinToRight = false;
-            spinToLeft = false;
-            PlayerController.shoot = false;
-            ballAnim.SetBool("shoot_roll", false);
-            if (gollednum > 0)
-            {
-                goal.SetActive(false);
-                spawnManager2.ActivateSpawners();
-            }
-            if (gollednum == 0)
-            {
-                gameManager.GameOver();
-            }
-            stopBall = true;
-
-            if (SceneManager.GetActiveScene().name == "SurvivalTutorial")
-            {
-                StopGame();
-                tipText8.gameObject.SetActive(true);
-            }
-        }
-
-        if (col.gameObject.CompareTag("goal line"))
-        {
-            if (gollednum == 0)
-            {
-                gollednum += 1;
-                gameManager.Goal();                
-            }           
-        }
-    }
-    private void OnTriggerStay2D(Collider2D col)
-    {
-        if (col.gameObject.CompareTag("defender_feet_collider") || col.gameObject.CompareTag("goalkeeper"))
-        {
-            spinToRight = false;
-            spinToLeft = false;
-            PlayerController.shoot = false;
-            ballAnim.SetBool("shoot_roll", false);
-            stopBall = true;
-            gameManager.GameOver();
-        }
-    }
-
-
-    private void OnTriggerExit2D(Collider2D col)
-    {
-        if (col.gameObject.CompareTag("defender_body")) 
-        {
-            gameManager.Nutmeg();            
-        }
-    }
-
-
-    private void MoveToAim()
-    {
-        if (IsAimOnGoal())
-        {
-            playerController.Shoot();
             movementController.MoveWithDirection(shootDirection, shootSpeed);
             Roll();
-            goalKeeperController.JumpToBall();
 
             if (Input.GetMouseButtonDown(0) && Time.timeScale == 1) // give spin to ball
             {
@@ -189,44 +91,111 @@ public class MoveForward : MonoBehaviour
                     }
                 }
             }
-        }
-        else
-        {
-            transform.position = Vector2.MoveTowards(transform.position, Aim, forwardSpeed * Time.deltaTime); // burda movementController kullanmayı dene, aşağıda da aynısı var.
-            Roll();
-        }       
-    }
 
-    private bool IsAimOnGoal()
-    {
-        if (goal.activeInHierarchy)
-        {
-            if (goal.transform.position.y - 6 > Aim.y)
+            if (spinToRight)
             {
-                return true;
-            }
-            else
-            {                
-                return false;
+                // transform.Translate(new Vector3(3f, 0f, 0f) * Time.deltaTime * spinSpeed);
+                movementController.MoveWithDirection(new Vector3(3f, 0f, 0f), spinSpeed);
             }
 
+            if (spinToLeft)
+            {
+                // transform.Translate(new Vector3(-3f, 0f, 0f) * Time.deltaTime * spinSpeed);
+                movementController.MoveWithDirection(new Vector3(-3f, 0f, 0f), spinSpeed);
+            }
         }
+        else if (pass)
+        {
+            Roll();
+            movementController.MoveToAim(aim, forwardSpeed);            
+        }        
         else
         {
-            return false;
+            Noneless();
+            gollednum = 0;
         }
     }
 
 
-    private void AimCalculator()
+    private void OnTriggerEnter2D(Collider2D col)
     {
-        mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePos.z = 1;
-        Aim = mousePos;
-        shootDirection = (Aim - transform.position).normalized;
+        if (col.gameObject.CompareTag("egoist"))
+        {
+            stop = false;            
+            pass = false;
+        }
+
+        if (col.gameObject.CompareTag("goal"))
+        {
+            stop = true;
+            shoot = false;
+            spinToRight = false;
+            spinToLeft = false;
+            ballAnim.SetBool("shoot_roll", false);
+            if (gollednum > 0)
+            {
+                goal.SetActive(false);
+                spawnManager2.ActivateSpawners();
+            }
+            if (gollednum == 0)
+            {
+                gameManager.GameOver();
+            }
+
+            if (SceneManager.GetActiveScene().name == "SurvivalTutorial")
+            {
+                StopGame();
+                tipText8.gameObject.SetActive(true);
+            }
+        }
+
+        if (col.gameObject.CompareTag("goal line"))
+        {
+            if (gollednum == 0)
+            {
+                gollednum += 1;
+                gameManager.Goal();
+            }
+        }
     }
-    
-    
+    private void OnTriggerStay2D(Collider2D col)
+    {
+        if (col.gameObject.CompareTag("defender_feet_collider") || col.gameObject.CompareTag("goalkeeper"))
+        {
+            shoot = false;
+            pass = false;
+            gameManager.GameOver();
+            spinToRight = false;
+            spinToLeft = false;
+            ballAnim.SetBool("shoot_roll", false);
+        }
+    }
+
+
+    private void OnTriggerExit2D(Collider2D col)
+    {
+        if (col.gameObject.CompareTag("defender_body"))
+        {
+            gameManager.Nutmeg();
+        }
+    }
+
+    public void Shooted(Vector3 aim)
+    {
+        shootDirection = (aim - transform.position).normalized;
+        shoot = true;
+
+        goalKeeperController.JumpToBall(aim);
+
+    }
+
+    public void Passed(Vector3 aim)
+    {
+        this.aim = aim;
+        pass = true;
+    }
+
+
     private void Noneless()
     {
         ballAnim.SetBool("roll", false);
@@ -238,18 +207,7 @@ public class MoveForward : MonoBehaviour
     {
         ballAnim.SetBool("roll", true);
     }
-
-    private bool IsPointerOverUIObject()
-    {
-        // Referencing this code for GraphicRaycaster https://gist.github.com/stramit/ead7ca1f432f3c0f181f
-        // the ray cast appears to require only eventData.position.
-        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
-        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-
-        List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
-        return results.Count > 0;
-    }
+    
 
     public void MiddleOfShooting()
     {
@@ -262,8 +220,8 @@ public class MoveForward : MonoBehaviour
                 tipClick7.gameObject.SetActive(true);
                 alreadyDone = true;
                 turn += 1;
-            }  
-            
+            }
+
             if (turn == 1)
             {
                 StopGame();
@@ -301,5 +259,3 @@ public class MoveForward : MonoBehaviour
     }
      */
 }
-
-

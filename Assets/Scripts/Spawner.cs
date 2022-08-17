@@ -57,7 +57,7 @@ public class Spawner : MonoBehaviour
             {
                 spawnManager2.StopAllSpawners();
             }
-            coroutine.StartTimer(Spawn, waitingTimeForSpawn);
+            coroutine.StartFunctionTimer(Spawn, waitingTimeForSpawn);
         }
     }
 
