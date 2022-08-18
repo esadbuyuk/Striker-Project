@@ -18,7 +18,6 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
     private bool ignoreCountdown = true;
     private bool pressToBall = false;
     [SerializeField] GameObject ball;
-    private float sprintSpeed = 5.0f;
     // public Vector3 positionOffset;
     private Vector3 position;
     // private float onPositionSpeed = 2.5f;   

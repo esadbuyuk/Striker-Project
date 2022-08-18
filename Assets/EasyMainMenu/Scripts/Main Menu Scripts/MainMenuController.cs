@@ -5,11 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuController : MonoBehaviour {
 
-    Animator anim;
-
-    
+    Animator anim;    
     public int quickSaveSlotID;
-
     [Header("Options Panel")]
     public GameObject MainOptionsPanel;
     public GameObject StartGameOptionsPanel;

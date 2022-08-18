@@ -5,12 +5,10 @@ public class DefenderController : MonoBehaviour
 {
     private DefenderTypeChooser defenderTypeChooser;
     private SliderBehaviour sliderBehaviour;
-    // private TimerBehaviour timerBehaviour;
     private Animator defenderAnim;
     private DefenderShoulder defenderShoulder;
     private DestroyOutOfBounds destroyOutOfBounds;
-    [SerializeField]
-    private TextMeshProUGUI dangerText;
+    [SerializeField] private TextMeshProUGUI dangerText;
     private SpriteRenderer mySpriteRenderer;
     private ITimerBehaviour timerBehaviour;
 
@@ -39,7 +37,6 @@ public class DefenderController : MonoBehaviour
         defenderShoulder = GetComponent<DefenderShoulder>();
         destroyOutOfBounds = GetComponent<DestroyOutOfBounds>();
         mySpriteRenderer = GetComponent<SpriteRenderer>();
-
         defenderTypeChooser = GetComponent<DefenderTypeChooser>();
         sliderBehaviour = GetComponent<SliderBehaviour>();
         timerBehaviour = GetComponent<ITimerBehaviour>();

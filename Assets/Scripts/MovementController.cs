@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class MovementController
 {
-    // private readonly IPlayerInput playerInput;
     private readonly Transform transformToMove;
     private readonly AttributeSettings attributeSettings;
 
 
     public MovementController(Transform transformToMove, AttributeSettings attributeSettings)
     {
-        // this.playerInput = playerInput; parametre ekleme gerekicek. 
         this.transformToMove = transformToMove;
         this.attributeSettings = attributeSettings;
     }

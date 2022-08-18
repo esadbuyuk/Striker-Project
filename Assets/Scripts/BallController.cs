@@ -12,7 +12,6 @@ public class BallController : MonoBehaviour
     private readonly float forwardSpeed = 15f;
     private float shootSpeed = 20f; // you checked the full kinematic contacts and continues detection in ball rb. // StrikerDesign ı duzelt
     private float spinSpeed = 1;
-
     private Vector3 shootDirection;
     private Animator ballAnim;
     private GameObject egoist;
@@ -25,6 +24,7 @@ public class BallController : MonoBehaviour
     private bool spinToRight = false;
     private bool spinToLeft = false;
     private bool alreadyDone = false;
+    [Header("Tip Text Panel")]
     [SerializeField] private TextMeshProUGUI tipText7;
     [SerializeField] private TextMeshProUGUI tipClick7;
     [SerializeField] private TextMeshProUGUI tipText8;
