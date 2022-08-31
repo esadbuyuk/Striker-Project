@@ -32,7 +32,7 @@ public class DefenderTypeChooser : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        defenderType = Random.Range(1, 4);  // 2 1 yap�lcak
+        defenderType = Random.Range(2, 4);  // 2 1 yap�lcak
 
         if (defenderType == 1)
         {
@@ -48,7 +48,7 @@ public class DefenderTypeChooser : MonoBehaviour
 
     public void ReselectDefenderType()
     {        
-        defenderType = Random.Range(1, 4);  // 2 1 yap�lcak
+        defenderType = Random.Range(2, 4);  // 2 1 yap�lcak
 
         if (defenderType == 1)
         {

@@ -9,6 +9,7 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
     private DefenderShoulder defenderShoulder;
     private bool getPositioned = false;
     [SerializeField] TextMeshProUGUI dangerText;
+    [SerializeField] TextMeshProUGUI stunnedText;
     private Animator defenderAnim;
     private PlayerController playerController;
     // private bool stunned = false;
@@ -32,8 +33,11 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
     //private bool timer = false;
     // public bool defenderIsFalling = false;
     private MovementController movementController;
+    private PositionController positionController;
     [SerializeField] private AttributeSettings attributeSettings;
-
+    private bool activated = false;
+    private bool stunned = false;
+    public bool IsStealing { get; private set; }
 
     void OnDisable()
     {
@@ -43,8 +47,12 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
             coroutineStarted = false;
             ignoreCountdown = true;
             pressToBall = false;
-            // stunned = false;           
             collide_count = 0;
+            activated = false;
+            stunned = false;
+            positionController.ResetCoordinates();
+            positionController.PositionIsEmptied();
+            IsStealing = false;
         }
     }
 
@@ -55,11 +63,14 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
         defenderAnim = gameObject.GetComponent<Animator>();
         playerController = GameObject.Find("egoist").GetComponent<PlayerController>();
         movementController = new MovementController(transform, attributeSettings);
+        positionController = posCollider.GetComponent<PositionController>();
     }
 
 
     public void ActivateTimerBehaviour()
     {
+        activated = true;
+
         if (defenderShoulder.Falled)
         {
             // getPositioned = false;
@@ -67,12 +78,11 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
             // defenderAnim.SetTrigger("Fall_to_right");
             // stunned = true;
             // defenderIsFalling = false; // bunu düzelt kötü oldu böyle. bir kere buraya girip çıkması için yaptın.
-        }/*
+        }
         else if (stunned)
-        {            
-            Debug.LogWarning("stunned");
+        {
             // stunned animasyonu veya texti gelebilir. Asl�nda gelmese daha iyi olur ��nk� bu oldu�unda a�a��daki olas�l�klara girmemesi i�in var ve bu yeterli. 
-        }*/
+        }
         else if (!playerController.HaveBall) // buras� freeBalldu! // top oyuncuda de�ilken
         {
             blockerForIf = 0;
@@ -103,7 +113,7 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
         }
         else if (!getPositioned) // top oyuncuda ve pozisyon al�nmad���nda yani pozisyona ko�mak istedi�inde
         {
-            dangerText.gameObject.SetActive(false);
+            dangerText.gameObject.SetActive(false); // bunları burda yapmamanın bir yolunu bul
             collide_count = 0;
             defenderAnim.ResetTrigger("Runback");
             defenderAnim.SetTrigger("Sprint");
@@ -133,7 +143,7 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
             if (!coroutineStarted) // countdown ba�lamad�ysa
             {
                 StartCoroutine(StealCountdownRoutine());
-            }
+            }            
         }
 
         // Inputs:       
@@ -141,26 +151,55 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
         {
             pressToBall = true;
         }
+
+        if (stunned)
+        {
+            stunnedText.gameObject.SetActive(true);
+            defenderAnim.speed = 0;
+
+        }
+        else
+        {
+            stunnedText.gameObject.SetActive(false);
+            defenderAnim.speed = 1;
+        }
     }
 
+    public void Shake()
+    {
+        positionController.Shake();
+        ignoreCountdown = true;
+    }
+
+    public void Stun()
+    {
+        StartCoroutine(StunCountdown());
+        stunned = true;
+        positionController.MoveDown();
+    }
 
     private void OnTriggerStay2D(Collider2D col)
     {
-        if (col.gameObject.CompareTag(posCollider.tag) && collide_count == 0) // is defender getPositioned? burda görünmeyen && timer? var.
+        if (activated)
         {
-            collide_count += 1;
-            ignoreCountdown = true;
-            getPositioned = true;
-        }
+            if (col.gameObject.CompareTag(posCollider.tag) && collide_count == 0) // is defender getPositioned?
+            {
+                collide_count += 1;
+                ignoreCountdown = true;
+                getPositioned = true;
+                positionController.PositionIsFilled();
+            }
+        }        
     }
+        
 
     private void RunToBall() // bunları movementControllerdan çağır.
     {
         getPositioned = false;
         ignoreCountdown = true;
         movementController.MoveToAim(ball.transform.position, attributeSettings.SprintSpeed);
+        positionController.PositionIsEmptied();
     }
-
 
     private void RunToPosition() // bunları movementControllerdan çağır.
     {
@@ -184,66 +223,90 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
         PositionCalculator();
         transform.SetPositionAndRotation(position, posCollider.transform.rotation);
 
+        /*
+        if (IsStealing)
+        {
+            transform.position = position;
+        }
+        else
+        {
+            transform.SetPositionAndRotation(position, posCollider.transform.rotation);
+        }*/
+
         // transform.Translate(onPositionSpeed * Time.deltaTime * Vector3.up, Space.World);
         /*if (rightDefenderAnim.GetCurrentAnimatorStateInfo(0).IsName("runback_right"))
         {
             rightDefenderAnim.SetBool("Runback", false); // bu ko�uldan kurtul
         }*/
     }
-
+    
 
     IEnumerator StealCountdownRoutine()
     {
-        ignoreCountdown = false; // this is for ignore countdown if a button pressed while counting.
-
         coroutineStarted = true;
+        ignoreCountdown = false; // this is for ignore countdown if a button pressed while counting.
         yield return new WaitForSeconds(Random.Range(1, 3));
         coroutineStarted = false;
 
         if (!ignoreCountdown)
         {
-            getPositioned = false;
-            defenderAnim.SetTrigger("Steal_to_ball");
-            transform.eulerAngles = new Vector3(0, 0, -28);
-            pressToBall = true;
+            Steal();
             ignoreCountdown = true;
-            // stunned = true;
         }
 
     }
 
+    IEnumerator StunCountdown()
+    {        
+        // ignoreCountdown = false; // this is for ignore countdown if a button pressed while counting.
+        yield return new WaitForSeconds(Random.Range(0.5f, 2));
 
-    // Bu fonksiyonu playerControllerdan çağırman gerek!
-    public void Steal() // bunları movementControllerdan çağır.
+        stunned = false;
+        pressToBall = true;
+        
+        if (!ignoreCountdown)
+        {
+            
+        }
+    }
+
+
+    public void Steal()
     {
         if (getPositioned)
         {
-            // stunned = true;
+            IsStealing = true;
             ignoreCountdown = true;
-            getPositioned = false;
-
-            // transform.eulerAngles = new Vector3(0, 0, 0);
-
-            Vector3 lookdirection = ball.transform.position - transform.position;//normalized gelebilir.                           
-            Quaternion rotation = Quaternion.LookRotation(Vector3.forward, -lookdirection);
-
-            transform.rotation = rotation;
-
+            positionController.StealMovement();
             defenderAnim.SetTrigger("Steal");
-            defenderAnim.SetBool("Runback", false);
+
+            // transform.eulerAngles = new Vector3(0, 0, -60);
+            /*
+            Vector3 lookPoint = ball.transform.position;
+            lookPoint.y += 1.3f;
+            lookPoint.x += 0.1f;
+
+            Vector3 lookdirection = lookPoint - transform.position;                           
+            Quaternion rotation = Quaternion.LookRotation(Vector3.forward, -lookdirection);
+            transform.rotation = rotation;
+            */
+            // transform.rotation = posCollider.transform.rotation;
+
+            // posCollider.GetComponent<PositionController>().PositionIsEmptied();
         }
     }
 
-
-    // Animation event ile cagırılıyor.
-    private void StealFinished()
+    // I call this with animation event.
+    private void ActionCompleted() 
     {
-        getPositioned = false;
-        pressToBall = true;
-        // stunned = false;
+        if (IsStealing)
+        {
+            IsStealing = false;
+            // positionController.ResetRotation();
+        }
     }
 
-
+   
     private bool IsPointerOverUIObject()
     {
         // Referencing this code for GraphicRaycaster https://gist.github.com/stramit/ead7ca1f432f3c0f181f
@@ -255,4 +318,6 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
         EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
         return results.Count > 0;
     }
+
+    
 }

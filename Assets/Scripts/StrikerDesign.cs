@@ -12,7 +12,7 @@ public class StrikerDesign : MonoBehaviour
     void Start()
     {
         playerAnim = GetComponent<Animator>();
-        playerAnim.SetFloat("dodge_no", skillSettings.DodgeNo);
+        playerAnim.SetFloat("shift_no", skillSettings.ShiftNo);
     }
 
     // Update is called once per frame

@@ -4,5 +4,11 @@ using UnityEngine;
 
 public interface ITimerBehaviour
 {
+    public bool IsStealing { get; }
     public void ActivateTimerBehaviour();
+
+    public void Stun();
+
+    public void Shake();
+
 }

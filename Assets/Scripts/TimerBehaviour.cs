@@ -30,6 +30,9 @@ public class TimerBehaviour : MonoBehaviour, ITimerBehaviour
     // private bool gameStopped = false;
     // private bool alreadyDone = false;
     private int collide_count = 0;
+
+    bool ITimerBehaviour.IsStealing => throw new System.NotImplementedException();
+
     //private bool timer = false;
     // public bool defenderIsFalling = false;
 
@@ -265,5 +268,15 @@ public class TimerBehaviour : MonoBehaviour, ITimerBehaviour
         List<RaycastResult> results = new List<RaycastResult>();
         EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
         return results.Count > 0;
+    }
+
+    void ITimerBehaviour.Stun()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void Shake()
+    {
+        throw new System.NotImplementedException();
     }
 }

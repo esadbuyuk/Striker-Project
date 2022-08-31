@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 
 public class BallController : MonoBehaviour
 {    
-    private readonly float forwardSpeed = 15f;
+    private readonly float forwardSpeed = 4f;
     private float shootSpeed = 20f; // you checked the full kinematic contacts and continues detection in ball rb. // StrikerDesign ı duzelt
     private float spinSpeed = 1;
     private Vector3 shootDirection;
@@ -107,7 +107,8 @@ public class BallController : MonoBehaviour
         else if (pass)
         {
             Roll();
-            movementController.MoveToAim(aim, forwardSpeed);            
+            movementController.MoveWithDirection((aim - transform.position), forwardSpeed);
+            // movementController.MoveToAim(aim, forwardSpeed);            
         }        
         else
         {

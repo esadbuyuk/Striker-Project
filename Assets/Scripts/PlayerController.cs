@@ -12,29 +12,39 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject goal;
     [SerializeField] private Button fakeButton;
     [SerializeField] private AttributeSettings attributeSettings;
+    [SerializeField] private SkillSettings skillSettings;
+    [SerializeField] private GameObject leftPositon;
+    [SerializeField] private GameObject rightPositon;
+    private PositionController rightPosController;
+    private PositionController leftPosController;
     private Animator playerAnim;
     private Quaternion rotationToUp;
     private DefenderShoulder defenderShoulder;
-    // [SerializeField] private GameObject rightDef;
-    // [SerializeField] private GameObject leftDef;
-    // private LDefenderController lDefenderController;
-    // private RDefenderController rDefenderController;
-    // public bool leftDfalling = false;
-    // public bool rightDfalling = false;  
+    [SerializeField] private GameObject rightDef;
+    [SerializeField] private GameObject leftDef;
+    private ITimerBehaviour lDefenderController;
+    private ITimerBehaviour rDefenderController;
     private BallController ballController;
     private GameObject collideDef;
     private MovementController movementController;
     private SpriteFlipper spriteFlipper;
     private Vector3 aim;
     private bool shoulderContestOn = false;
-
+    private bool shiftingToRight;
+    private bool shiftingToLeft;
+    private bool action;
+    [SerializeField] private float dribbleSpeed = 2.5f;
 
     private void Awake()
     {
         playerAnim = GetComponent<Animator>();
         ballController = ball.GetComponent<BallController>();
         movementController = new MovementController(transform, attributeSettings);
-        spriteFlipper = new SpriteFlipper(transform);       
+        spriteFlipper = new SpriteFlipper(transform);
+        leftPosController = leftPositon.GetComponent<PositionController>();
+        rightPosController = rightPositon.GetComponent<PositionController>();
+        lDefenderController = leftDef.GetComponent<ITimerBehaviour>();
+        rDefenderController = rightDef.GetComponent<ITimerBehaviour>();
     }
 
 
@@ -50,19 +60,136 @@ public class PlayerController : MonoBehaviour
     {
         EgoistInputs(); // bunun için ayrı bir class açılabilir ama vakit alıcağından şuanlık tercih etmiyorum.
 
-        if (HaveBall)
+        if (action)
         {
-            EgoistDribble();
+
+        }
+        else if (HaveBall)
+        {
+            Dribble();
         }
         else
         {
-            EgoistSprint();
+            Sprint();
         }
     }
 
 
-    private void EgoistInputs()
-    {/*
+    private void EgoistInputs() // animasyonlarda loop time ı kapa!
+    {
+        if (Input.GetKeyDown(KeyCode.A) && HaveBall && !action)
+        {
+            action = true;
+            // her iki savunmadan biri steal animasyonundaysa o tarafa kayılır ve dodge + stun olur.
+            // aynı anda sağ ve sol pozisonlar doluysa seçim rastgele yapılır.
+            // sol pozisyon boşsa sola kayılır.
+            // sağ pozisyon boşsa sağa kayılır.
+            // ikiside boşsa seçim rastgele yapılır.
+
+            /*
+            if (lDef.IsStealing)
+            {
+                lDef.Stun();
+            }
+            
+            if (rdef.IsStealing)
+            {
+                lDef.Stun();                
+            }*/
+
+            #region Smart Shifting 
+
+            if (lDefenderController.IsStealing)
+            {
+                lDefenderController.Stun();
+                ShiftToLeft();
+            }
+            else if (rDefenderController.IsStealing)
+            {
+                rDefenderController.Stun();
+                ShiftToRight();
+            }
+            else if (rightPosController.IsPositionFull() && leftPosController.IsPositionFull())
+            {
+                switch (Random.Range(1, 3))
+                {
+                    case 1:
+                        ShiftToRight();
+                        break;
+                    case 2:
+                        ShiftToLeft();
+                        break;                    
+                }
+            }
+            else if (!rightPosController.IsPositionFull() && !leftPosController.IsPositionFull())
+            {
+                switch (Random.Range(1, 3))
+                {
+                    case 1:
+                        ShiftToRight();
+                        break;
+                    case 2:
+                        ShiftToLeft();
+                        break;
+                }
+            }
+            else if (rightPosController.IsPositionFull())
+            {
+                ShiftToLeft();
+            }
+            else if (leftPosController.IsPositionFull())
+            {
+                ShiftToRight();
+            }
+            #endregion
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q) && HaveBall && !action) // IsStealing true iken stun yiyebilir burda da.
+        {
+            #region Smart Faking 
+
+            if (rightPosController.IsPositionFull() && leftPosController.IsPositionFull())
+            {
+                switch (Random.Range(1, 3))
+                {
+                    case 1:
+                        FakeRight();
+                        rDefenderController.Shake();
+                        break;
+                    case 2:
+                        FakeLeft();
+                        lDefenderController.Shake();
+                        break;
+                }
+            }
+            else if (!rightPosController.IsPositionFull() && !leftPosController.IsPositionFull())
+            {
+                switch (Random.Range(1, 3))
+                {
+                    case 1:
+                        FakeRight();
+                        rDefenderController.Shake();
+                        break;
+                    case 2:
+                        FakeLeft();
+                        lDefenderController.Shake();
+                        break;
+                }
+            }
+            else if (rightPosController.IsPositionFull())
+            {
+                FakeRight();
+                rDefenderController.Shake();
+            }
+            else if (leftPosController.IsPositionFull())
+            {
+                FakeLeft();
+                lDefenderController.Shake();
+            }
+            #endregion
+        }
+
+        /*
         if (RDefenderController.getPositionedR || LDefenderController.getPositionedL) // sag savunma pozisyon almamis ise saga kayma yapilabilsin.
         {
             fakeButton.interactable = true;
@@ -120,7 +247,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.Q)) // burda skills state machine e dodge triggerı ile giriyor onu düzeltmen gerekebilir.
         { 
             if (RDefenderController.getPositionedR)
             {
@@ -163,7 +290,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
+    #region ShoulderContest
     private void OnTriggerStay2D(Collider2D col) // ShoulderContest
     {
         if (col.gameObject.CompareTag("defender_body")) // defenderlarin isTrigger acik.
@@ -173,7 +300,7 @@ public class PlayerController : MonoBehaviour
                 // animation event works here!                
 
                 collideDef = col.gameObject;
-                defenderShoulder = collideDef.GetComponent<DefenderShoulder>();        
+                defenderShoulder = collideDef.GetComponent<DefenderShoulder>();
 
                 if (IsDefOnLeft())
                 {
@@ -190,11 +317,12 @@ public class PlayerController : MonoBehaviour
                 playerAnim.SetBool("shoulder_contest", true);
                 shoulderContestOn = true;
             }
-        }               
+        }
     }
+    #endregion
 
-
-    private void OnTriggerEnter2D(Collider2D col) // Avoid, HaveBall
+    #region Take ball, Avoid
+    private void OnTriggerEnter2D(Collider2D col)
     {
         if (col.gameObject.CompareTag("tackle collider"))
         {
@@ -207,7 +335,7 @@ public class PlayerController : MonoBehaviour
         if (col.gameObject.CompareTag("ball"))
         {
             HaveBall = true;
-            
+
             if (shoulderContestOn == true)
             {
                 playerAnim.SetBool("shoulder_contest", false);
@@ -215,7 +343,36 @@ public class PlayerController : MonoBehaviour
                 defenderShoulder.EndShoulderContest();
             }
         }
-    } 
+    }
+    #endregion
+
+    public void ActionCompleted() // ı call this with animation event.
+    {
+        action = false;
+        
+        if (shiftingToRight)
+        {
+            ShiftDefenderPosition(rightPosController);
+            ShiftDefenderPosition(leftPosController);
+            shiftingToRight = false;
+        }
+        else if (shiftingToLeft)
+        {
+            ShiftDefenderPosition(leftPosController);
+            ShiftDefenderPosition(rightPosController);
+            shiftingToLeft = false;
+        }
+    }
+
+    public void FreezeDefenderPosition(PositionController positionController)
+    {
+        positionController.Freeze();
+    }
+
+    public void ShiftDefenderPosition(PositionController positionController)
+    {
+        positionController.Shift();
+    }
 
     public void PassBall() // ı call this with animation event.
     {
@@ -235,6 +392,40 @@ public class PlayerController : MonoBehaviour
         {
             defenderShoulder.StartShoulderContest(IsDefOnLeft());
         }
+    }  
+
+    private void FakeRight()
+    {
+        action = true;
+        transform.localScale = new Vector3(1f, 1f, 1f);
+        playerAnim.SetTrigger("fake");
+    }
+
+    private void FakeLeft()
+    {
+        action = true;
+        transform.localScale = new Vector3(-1f, 1f, 1f);
+        playerAnim.SetTrigger("fake");
+    }
+
+    private void ShiftToRight()
+    {
+        shiftingToRight = true;
+        action = true;
+        transform.localScale = new Vector3(1f, 1f, 1f);
+        playerAnim.SetTrigger("shift");
+        FreezeDefenderPosition(rightPosController);
+        FreezeDefenderPosition(leftPosController);
+    }
+
+    private void ShiftToLeft()
+    {
+        shiftingToLeft = true;
+        action = true;
+        transform.localScale = new Vector3(-1f, 1f, 1f);
+        playerAnim.SetTrigger("shift");
+        FreezeDefenderPosition(leftPosController);
+        FreezeDefenderPosition(rightPosController);
     }
 
     private bool IsAimOnGoal()
@@ -287,8 +478,7 @@ public class PlayerController : MonoBehaviour
         return angle > 0;
     }
 
-
-    private void EgoistSprint()
+    private void Sprint()
     {
         spriteFlipper.FlipToRight();
 
@@ -298,19 +488,18 @@ public class PlayerController : MonoBehaviour
         playerAnim.ResetTrigger("dribble");
 
         movementController.MoveToAim(ball.transform.position, shoulderContestOn ? attributeSettings.SholContestSpeed : attributeSettings.SprintSpeed);       
-    }
-       
+    }       
 
-    private void EgoistDribble()
+    private void Dribble()
     {
-        // transform.localScale = new Vector3(1f, 1f, 1f); buraya koyarsan dodgelara da etki ediyor
+        transform.localScale = new Vector3(1f, 1f, 1f); // buraya koyarsan dodgelara da etki ediyor
+        transform.Translate(Vector3.up * Time.deltaTime * dribbleSpeed);
 
         playerAnim.ResetTrigger("sprint");
-        playerAnim.SetTrigger("dribble"); // animation has a movement in itself.
+        playerAnim.SetTrigger("dribble");
         transform.rotation = rotationToUp;
     }
 
-    
 
     /*
     public void GoRight()

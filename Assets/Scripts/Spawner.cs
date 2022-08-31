@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
+    [SerializeField]
+    private bool stopSpawn;
     public new GameObject camera;
     private Vector3 instantiateOffsetR;
     private Vector3 instantiateOffsetL;
@@ -63,13 +65,16 @@ public class Spawner : MonoBehaviour
 
     private void Spawn()
     {
-        transform.position = SpawnPosCalculator();
-        gameObject.SetActive(true);
-
-        if (!spawnAlone)
+        if (!stopSpawn)
         {
-            spawnManager2.IncreaseSpawnedDefs();
-        }
+            transform.position = SpawnPosCalculator();
+            gameObject.SetActive(true);
+
+            if (!spawnAlone)
+            {
+                spawnManager2.IncreaseSpawnedDefs();
+            }
+        }        
     }    
 
     private Vector3 SpawnPosCalculator()
