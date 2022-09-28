@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class StrikerDesign : MonoBehaviour
 {
-    private Animator playerAnim;
+    // [SerializeField] private Animator playerAnim;
     [SerializeField] private AttributeSettings attributeSettings;
     [SerializeField] private SkillSettings skillSettings;
 
     // Start is called before the first frame update
     void Start()
     {
-        playerAnim = GetComponent<Animator>();
-        playerAnim.SetFloat("shift_no", skillSettings.ShiftNo);
+        // playerAnim = GetComponent<Animator>();
+        // playerAnim.SetFloat("shift_no", skillSettings.ShiftNo); // burda animator yok ki.
     }
 
     // Update is called once per frame
@@ -28,7 +28,8 @@ public class StrikerDesign : MonoBehaviour
 
     public void FastStrikerSelected()
     {
-        // fastStrikerData yı playerController ın attribute Settings değişkenine atıycaksın. Data bilgileri aşağıda.
+        attributeSettings.SelectFastAttributes();
+        // shootSpeed değişkenini de ayarla.
 
         // PlayerController.sprintSpeed = 8;
         // PlayerController.shContestSpeed = 3.2f;
@@ -37,7 +38,8 @@ public class StrikerDesign : MonoBehaviour
 
     public void StrongStrikerSelected()
     {
-        // StronhStrikerData yı playerController ın attribute Settings değişkenine atıycaksın. Data bilgileri aşağıda.
+        attributeSettings.SelectStrongAttributes();
+        // shootSpeed değişkenini de ayarla.
 
         // PlayerController.sprintSpeed = 5.5f;
         // PlayerController.shContestSpeed = 4.2f;

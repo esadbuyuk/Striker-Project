@@ -34,7 +34,7 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
     // public bool defenderIsFalling = false;
     private MovementController movementController;
     private PositionController positionController;
-    [SerializeField] private AttributeSettings attributeSettings;
+    // [SerializeField] private AttributeSettings attributeSettings;
     private bool activated = false;
     private bool stunned = false;
     public bool IsStealing { get; private set; }
@@ -53,6 +53,7 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
             positionController.ResetCoordinates();
             positionController.PositionIsEmptied();
             IsStealing = false;
+            defenderAnim.speed = 1;
         }
     }
 
@@ -62,8 +63,13 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
         defenderShoulder = gameObject.GetComponent<DefenderShoulder>();
         defenderAnim = gameObject.GetComponent<Animator>();
         playerController = GameObject.Find("egoist").GetComponent<PlayerController>();
-        movementController = new MovementController(transform, attributeSettings);
+        // movementController = new MovementController(transform, attributeSettings);
         positionController = posCollider.GetComponent<PositionController>();
+    }
+
+    public void SetMovementController(MovementController mc)
+    {
+        movementController = mc;
     }
 
 
@@ -147,7 +153,7 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
         }
 
         // Inputs:       
-        if (Input.GetMouseButtonDown(0) && playerController.HaveBall && !IsPointerOverUIObject() && Time.timeScale == 1)
+        if (Input.GetMouseButtonDown(0) && playerController.HaveBall && !IsPointerOverUIObject() && Time.timeScale != 0)
         {
             pressToBall = true;
         }
@@ -197,7 +203,7 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
     {
         getPositioned = false;
         ignoreCountdown = true;
-        movementController.MoveToAim(ball.transform.position, attributeSettings.SprintSpeed);
+        movementController.MoveToAim(ball.transform.position); // burda sprintSpeed parametresi olmasa da olur.
         positionController.PositionIsEmptied();
     }
 
@@ -207,7 +213,7 @@ public class TimerBehaviour1 : MonoBehaviour, ITimerBehaviour
         collide_count = 0;
         PositionCalculator();
         ignoreCountdown = true;
-        movementController.MoveToAim(position, attributeSettings.SprintSpeed);        
+        movementController.MoveToAim(position);        
     }
 
     private Vector3 PositionCalculator()

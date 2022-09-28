@@ -41,7 +41,7 @@ public class MovementController
         }            
     }
 
-    public void MoveWithDirection(Vector3 direction, float? moveSpeed = null) // kontrol edilmedi.
+    public void MoveWithDirection(Vector3 direction, float? moveSpeed = null) // tip: if direction is refreshing on update movement can go to a point with fast to slow motion.
     {
         if (moveSpeed == null)
         {

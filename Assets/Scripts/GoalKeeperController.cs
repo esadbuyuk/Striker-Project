@@ -95,15 +95,14 @@ public class GoalKeeperController : MonoBehaviour
         {
             if (transform.position.x - egoist.transform.position.x > 4)
             {
-                transform.Translate(0.5f, 0, 0);
+                transform.Translate(Time.deltaTime * 350 * new Vector3(0.5f, 0, 0));
             }
 
             if (transform.position.x - egoist.transform.position.x < -4)
             {
-                transform.Translate(-0.5f, 0, 0);
+                transform.Translate(Time.deltaTime * 350 * new Vector3(-0.5f, 0, 0));
             }
-        }
-        
+        }        
     }
 
 

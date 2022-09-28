@@ -57,7 +57,10 @@ public class TimerBehaviour : MonoBehaviour, ITimerBehaviour
         playerController = GameObject.Find("egoist").GetComponent<PlayerController>();
 
     }
-        
+    public void SetMovementController(MovementController mc)
+    {
+        // movementController = mc;
+    }
 
     public void ActivateTimerBehaviour()
     {
@@ -138,7 +141,7 @@ public class TimerBehaviour : MonoBehaviour, ITimerBehaviour
         }
 
         // Inputs:       
-        if (Input.GetMouseButtonDown(0) && playerController.HaveBall && !IsPointerOverUIObject() && Time.timeScale == 1)
+        if (Input.GetMouseButtonDown(0) && playerController.HaveBall && !IsPointerOverUIObject() && Time.timeScale != 0)
         {
             pressToBall = true;
 

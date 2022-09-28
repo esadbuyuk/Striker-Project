@@ -9,12 +9,11 @@ public class SliderBehaviour : MonoBehaviour
     private Vector3 distanceToBall;
     private Animator defenderAnim;
     private PlayerController playerController;
-
-    // private bool getPositioned = false; // yalnızca timer da getpositioned olmasını sağla.
-    private float sprintSpeed = 5.0f; // bu değişkeni statik yapabilirsin ileride! cünkü her yerde farklı olabilir.
+    private float tackleSpeed = 5.0f;
     // private bool ignoreCountdown;
-    [SerializeField] private GameObject ball; // private idi public yaptın sorun yoksa silebilirsin.
+    [SerializeField] private GameObject ball;
     private Vector3 ballPosition;
+    private MovementController movementController;
 
 
     void Awake()
@@ -29,11 +28,10 @@ public class SliderBehaviour : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SetMovementController(MovementController mc)
     {
-        
-    }
+        movementController = mc;
+    }    
 
 
     public void ActivateSliderBehaviour()
@@ -73,37 +71,36 @@ public class SliderBehaviour : MonoBehaviour
     {
         // getPositioned = false;
 
-        transform.Translate(sprintSpeed * Time.deltaTime * Vector3.up);
+        transform.Translate(tackleSpeed * Time.deltaTime * Vector3.up);
         // ignoreCountdown = true;
     }
 
 
     private void RunToBall()
     {
-        // getPositioned = false;
-
-        // ignoreCountdown = true; slider da countdown ın başlamamasını sağla.
-
+        movementController.MoveToAim(ball.transform.position); // burda sprintSpeed parametresi olmasa da olur.
+        /*
         Vector3 lookdirection = ball.transform.position - transform.position; // normalized gelebilir.                           
         Quaternion rotation = Quaternion.LookRotation(Vector3.forward, lookdirection);
 
         transform.rotation = rotation;
-        transform.Translate(sprintSpeed * Time.deltaTime * Vector3.up);
+        transform.Translate(sprintSpeed * Time.deltaTime * Vector3.up);*/
     }
 
 
     private void RunForTackle()
     {
-        // getPositioned = false;
-        // ignoreCountdown = true;
-               
         ballPosition.z = transform.position.z;
         ballPosition.x = ball.transform.position.x + 0.0f;
         ballPosition.y = ball.transform.position.y + 1.2f;
+
+        movementController.MoveToAim(ballPosition); // burda sprintSpeed parametresi olmasa da olur.
+
+        /*
         Vector3 lookDirection = ballPosition - transform.position;
         Quaternion rotation = Quaternion.LookRotation(Vector3.forward, lookDirection);
 
         transform.rotation = rotation;
-        transform.Translate(sprintSpeed * Time.deltaTime * Vector3.up);
+        transform.Translate(sprintSpeed * Time.deltaTime * Vector3.up);*/
     }
 }

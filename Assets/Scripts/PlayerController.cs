@@ -80,24 +80,14 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A) && HaveBall && !action)
         {
             action = true;
+
+            #region Smart Shifting 
+
             // her iki savunmadan biri steal animasyonundaysa o tarafa kayılır ve dodge + stun olur.
             // aynı anda sağ ve sol pozisonlar doluysa seçim rastgele yapılır.
             // sol pozisyon boşsa sola kayılır.
             // sağ pozisyon boşsa sağa kayılır.
             // ikiside boşsa seçim rastgele yapılır.
-
-            /*
-            if (lDef.IsStealing)
-            {
-                lDef.Stun();
-            }
-            
-            if (rdef.IsStealing)
-            {
-                lDef.Stun();                
-            }*/
-
-            #region Smart Shifting 
 
             if (lDefenderController.IsStealing)
             {
@@ -276,7 +266,7 @@ public class PlayerController : MonoBehaviour
         }*/
 
 
-        if (Input.GetMouseButtonDown(0) && HaveBall && !IsPointerOverUIObject() && Time.timeScale == 1)
+        if (Input.GetMouseButtonDown(0) && HaveBall && !IsPointerOverUIObject() && Time.timeScale != 0)
         {
             AimCalculator();
             if (IsAimOnGoal())
@@ -382,6 +372,7 @@ public class PlayerController : MonoBehaviour
 
     public void ShootBall() // ı call this with animation event.
     {
+        // buraya bi shootSpeed parametresi gönder
         ballController.Shooted(aim);
         HaveBall = false;
     }
@@ -493,7 +484,7 @@ public class PlayerController : MonoBehaviour
     private void Dribble()
     {
         transform.localScale = new Vector3(1f, 1f, 1f); // buraya koyarsan dodgelara da etki ediyor
-        transform.Translate(Vector3.up * Time.deltaTime * dribbleSpeed);
+        transform.Translate(dribbleSpeed * Time.deltaTime * Vector3.up);
 
         playerAnim.ResetTrigger("sprint");
         playerAnim.SetTrigger("dribble");
@@ -501,112 +492,115 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    /*
-    public void GoRight()
+    
+    public void Shift()
     {
-        if (haveBall)
-        {           
-            if (RDefenderController.getPositionedR) // useless
-            {
-                // rDefenderController.Steal();
-            }
-            else
-            {
-                transform.localScale = new Vector3(-1f, 1f, 1f); // flip the animation to right
-                playerAnim.SetTrigger("dodge"); // Go_right olarak de�i�tirilip blend tree yap�l�cak.
-
-            }
-
-            if (LDefenderController.getPositionedL)// useless
-            {
-
-                // StartCoroutine(lDefenderController.StunCountdownRoutine(1));
-            }
-
-            if (LDefenderController.getPositionedL) // useless
-            {
-                // lDefenderController.Steal();
-            }
-            else
-            {
-                transform.localScale = new Vector3(1f, 1f, 1f);
-                playerAnim.SetTrigger("dodge");
-            }
-
-            if (RDefenderController.getPositionedR) // useless
-            {
-
-                // StartCoroutine(rDefenderController.StunCountdownRoutine(1));
-            }
-        }
-
-        if (shoot)
+        if (HaveBall && !action)
         {
-            moveForward.spinToRight = true;
-        }
-        
+            action = true;
+
+            #region Smart Shifting 
+
+            // her iki savunmadan biri steal animasyonundaysa o tarafa kayılır ve dodge + stun olur.
+            // aynı anda sağ ve sol pozisonlar doluysa seçim rastgele yapılır.
+            // sol pozisyon boşsa sola kayılır.
+            // sağ pozisyon boşsa sağa kayılır.
+            // ikiside boşsa seçim rastgele yapılır.
+
+            if (lDefenderController.IsStealing)
+            {
+                lDefenderController.Stun();
+                ShiftToLeft();
+            }
+            else if (rDefenderController.IsStealing)
+            {
+                rDefenderController.Stun();
+                ShiftToRight();
+            }
+            else if (rightPosController.IsPositionFull() && leftPosController.IsPositionFull())
+            {
+                switch (Random.Range(1, 3))
+                {
+                    case 1:
+                        ShiftToRight();
+                        break;
+                    case 2:
+                        ShiftToLeft();
+                        break;                    
+                }
+            }
+            else if (!rightPosController.IsPositionFull() && !leftPosController.IsPositionFull())
+            {
+                switch (Random.Range(1, 3))
+                {
+                    case 1:
+                        ShiftToRight();
+                        break;
+                    case 2:
+                        ShiftToLeft();
+                        break;
+                }
+            }
+            else if (rightPosController.IsPositionFull())
+            {
+                ShiftToLeft();
+            }
+            else if (leftPosController.IsPositionFull())
+            {
+                ShiftToRight();
+            }
+            #endregion
+        }        
     }
-
-    /*
-    public void GoLeft()
+   
+    
+    public void Fake()
     {
-        if (haveBall)
-        {                 
-            if (LDefenderContoller.getPositionedL) // useless
+        if (HaveBall && !action) // IsStealing true iken stun yiyebilir burda da.
+        {
+            #region Smart Faking 
+
+            if (rightPosController.IsPositionFull() && leftPosController.IsPositionFull())
             {
-                // lDefenderController.Steal();
+                switch (Random.Range(1, 3))
+                {
+                    case 1:
+                        FakeRight();
+                        rDefenderController.Shake();
+                        break;
+                    case 2:
+                        FakeLeft();
+                        lDefenderController.Shake();
+                        break;
+                }
             }
-            else
+            else if (!rightPosController.IsPositionFull() && !leftPosController.IsPositionFull())
             {
-                transform.localScale = new Vector3(1f, 1f, 1f);
-                playerAnim.SetTrigger("dodge");
+                switch (Random.Range(1, 3))
+                {
+                    case 1:
+                        FakeRight();
+                        rDefenderController.Shake();
+                        break;
+                    case 2:
+                        FakeLeft();
+                        lDefenderController.Shake();
+                        break;
+                }
             }
-
-            if (RDefenderController.getPositionedR) // useless
+            else if (rightPosController.IsPositionFull())
             {
-                
-                // StartCoroutine(rDefenderController.StunCountdownRoutine(1));
+                FakeRight();
+                rDefenderController.Shake();
             }
-        }           
-
-    }*/
-    /*
-    public void FakeRight()
-    {
-        if (haveBall && RDefenderController.getPositionedR)
-        {
-            transform.localScale = new Vector3(1f, 1f, 1f);
-            playerAnim.SetTrigger("fake"); // Fake_right olarak de�i�tirilip blend tree yap�l�cak.
-            rDefenderController.Steal();                              
+            else if (leftPosController.IsPositionFull())
+            {
+                FakeLeft();
+                lDefenderController.Shake();
+            }
+            #endregion
         }
-
-        if (shoot)
-        {
-            moveForward.spinToRight = true;
-        }
-
-        if (haveBall && LDefenderController.getPositionedL)
-        {
-            transform.localScale = new Vector3(-1f, 1f, 1f);
-            playerAnim.SetTrigger("fake"); // Fake_left olarak de�i�tirilip blend tree yap�l�cak.                        
-            lDefenderController.Steal();
-        }
-    }*/
-
-    /*
-    public void FakeLeft()
-    {
-        if (haveBall && LDefenderContoller.getPositionedL)
-        {
-            transform.localScale = new Vector3(-1f, 1f, 1f);
-            playerAnim.SetTrigger("fake"); // Fake_left olarak de�i�tirilip blend tree yap�l�cak.                        
-            lDefenderController.Steal();            
-        }
-               
-
     }
-
-    */
 
     private bool IsPointerOverUIObject()
     {

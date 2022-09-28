@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/Scenes/StrikerMenuScene.unity
     guid: c711d6d4bc1e40a4caf98bedc2f7224b
   - enabled: 1
+    path: Assets/Scenes/FixedSurvivalGoalScene.unity
+    guid: 83cc93fe05219ad4495d204ca8faeeac
+  - enabled: 0
     path: Assets/Scenes/SurvivalGoalScene.unity
     guid: b2384f46d45d74640bde510454291a58
   - enabled: 1
@@ -23,7 +26,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SkillsScene.unity
     guid: 22a79c1d4ba86c748879409a83631594
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SurvivalTutorial.unity
     guid: a129b1ee80421d540b26403064413088
   m_configObjects: {}

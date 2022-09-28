@@ -70,7 +70,7 @@ public class BallController : MonoBehaviour
             movementController.MoveWithDirection(shootDirection, shootSpeed);
             Roll();
 
-            if (Input.GetMouseButtonDown(0) && Time.timeScale == 1) // give spin to ball
+            if (Input.GetMouseButtonDown(0) && Time.timeScale != 0) // give spin to ball
             {
                 if (Input.mousePosition.x > Screen.width * 0.5f)
                 {

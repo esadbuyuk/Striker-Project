@@ -63,7 +63,7 @@ public class PositionController : MonoBehaviour
         }
         else if (shiftToRight)
         {
-            transform.position += new Vector3(0.01f, 0, 0);
+            transform.position += new Vector3(0.01f, 0, 0) * Time.deltaTime * 350;
             // transform.Translate(0.02f, 0, 0); bu arkadaş pozisyonu local olarak ölçüyor.
             if (transform.position.x > egoist.transform.position.x + offset.x)
             {
@@ -73,7 +73,7 @@ public class PositionController : MonoBehaviour
         }
         else if (shiftToLeft)
         {
-            transform.position += new Vector3(-0.01f, 0, 0);
+            transform.position += new Vector3(-0.01f, 0, 0) * Time.deltaTime * 350;
             // transform.Translate(-0.02f, 0, 0); bu arkadaş pozisyonu local olarak ölçüyor.
             if (transform.position.x < egoist.transform.position.x + offset.x)
             {
@@ -88,7 +88,7 @@ public class PositionController : MonoBehaviour
         }
         else*/ if (shakeToRight)
         {
-            transform.position += new Vector3(0.01f, 0, 0);
+            transform.position += new Vector3(0.01f, 0, 0) * Time.deltaTime * 350;
             if (transform.position.x > egoist.transform.position.x + offset.x + 1)
             {
                 shakeToRight = false;
@@ -99,7 +99,7 @@ public class PositionController : MonoBehaviour
         }
         else if (shakeToLeft)
         {           
-            transform.position += new Vector3(-0.01f, 0, 0);
+            transform.position += new Vector3(-0.01f, 0, 0) * Time.deltaTime * 350;
             if (transform.position.x < egoist.transform.position.x + offset.x - 1)
             {
                 shakeToLeft = false;
@@ -137,7 +137,6 @@ public class PositionController : MonoBehaviour
 
     public void Shift()
     {
-        Debug.Log("position -> Shift()");
         if (transform.position.x > egoist.transform.position.x + offset.x)
         {
             shiftToLeft = true;

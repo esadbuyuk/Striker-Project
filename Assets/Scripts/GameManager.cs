@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
         UpdateScore(0);
         StartCoroutine(AddScoreEverySecond(0.1f)); // kontrol edilmedi.
         // SceneManager.LoadScene("MyMainMenu");
-        // coroutine.StartFunctionTimer(UpdateScore(1), 1); // dont know why tis dont work.
+        // coroutine.StartFunctionTimer(UpdateScore(1), 1); // dont know why tis dont work.        
 
     }
 
@@ -98,6 +98,12 @@ public class GameManager : MonoBehaviour
         UpdateScore(500);
         goaltext.gameObject.SetActive(true);
         StartCoroutine(RemoveAfterSeconds(1.5f, goaltext.gameObject));
+
+        // daha sonradan oyun zorlaştıkça sadece savunmacıların hızı artıcak
+        if (Time.timeScale < 2)
+        {
+            Time.timeScale += 0.2f;
+        }
     }
 
     public void UpdateScore(int scoreToAdd)

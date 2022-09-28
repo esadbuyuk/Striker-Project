@@ -4,21 +4,26 @@ using UnityEngine;
 
 public class TestAndRecognize : MonoBehaviour
 {
+    public class User
+    {
+        public bool isAngry;
+    }
+    protected bool esadIsHandsome;
+
     private void Awake()
     {
-        Debug.Log("Awake");
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("start");
-        //gameObject.SetActive(false);
+        User esad = new User();
+        esad.isAngry = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("update");
+        Debug.Log(esadIsHandsome);
     }
 }
